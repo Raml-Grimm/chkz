@@ -37,8 +37,8 @@ class StripeChecker():
         self.purchase = "https://puppetcombo.itch.io/nun-massacre/purchase"
         self.stripe_tokens = "https://api.stripe.com/v1/tokens"
 
-        print("\n\n  {}------=[ {}CODEKILLER CHECKER {}]=------".format(fg[0], fg[1], fg[0]))
-        print("      {}--= {}Created by Codekiller {}=--          ".format(fg[0], fg[1], fg[0]))
+        print("\n\n  {}------=[ {}BloodHub CHECKER {}]=------".format(fg[0], fg[1], fg[0]))
+        print("      {}--= {}Created by BloodHub {}=--          ".format(fg[0], fg[1], fg[0]))
         print("  {}------========================------\n".format(fg[0]))
         self.check()
 
@@ -155,7 +155,7 @@ class StripeChecker():
 
                 if error_msg == "Your card's security code is incorrect.":
                     print(fg[1] + "┌───────[ " + credit_card + " ]──(" + str(credit_entry) + ")")
-                    print(fg[1] + "└────────── LIVE! ~> But Incorrect CVV (Good on Amazon)")
+                    print(fg[1] + "└────────── LIVE! ~> But Incorrect CVV (Good on Amazon and AliExpress)")
 
                 else:
                     print(fg[0] + "┌───────[ " + credit_card + " ]──(" + str(credit_entry) + ")")
