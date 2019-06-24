@@ -33,11 +33,6 @@ fg = [
 
 class StripeChecker():
 
-    def __init__(self):
-        self.main_domain = "https://puppetcombo.itch.io/nun-massacre"
-        self.purchase = "https://puppetcombo.itch.io/nun-massacre/purchase"
-        self.stripe_tokens = "https://api.stripe.com/v1/tokens"
-
         print("\n\n  {}------=[ {}BloodHub Premium Checker {}]=------".format(fg[0], fg[1], fg[0]))
         print("                {}--= {}Mass Checker {}=--          ".format(fg[0], fg[1], fg[0]))
         print("         {}------========================------\n".format(fg[0]))
